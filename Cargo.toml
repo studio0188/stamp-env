@@ -1,0 +1,19 @@
+[package]
+name = "stamp-env"
+version = "0.1.0"
+edition = "2021"
+description = "프리셋 기반 폴더/파일 구조를 심링크로 배포하는 CLI 도구"
+license = "MIT"
+
+[[bin]]
+name = "stamp"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.4", features = ["derive"] }
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+toml = "0.7"
+walkdir = "2"
+dirs = "5"
+glob = "0.3"
