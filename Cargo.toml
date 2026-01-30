@@ -2,7 +2,7 @@
 name = "stamp-env"
 version = "0.1.0"
 edition = "2021"
-description = "프리셋 기반 폴더/파일 구조를 심링크로 배포하는 CLI 도구"
+description = "A CLI tool for deploying preset-based folder/file structures via symlinks"
 license = "MIT"
 repository = "https://github.com/studio0188/stamp-env"
 homepage = "https://github.com/studio0188/stamp-env"

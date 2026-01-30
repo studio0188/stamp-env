@@ -2,40 +2,40 @@ pub mod manager;
 
 use serde::{Deserialize, Serialize};
 
-/// 프리셋 내 개별 항목 (파일 또는 디렉토리)
+/// Individual item in a preset (file or directory)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PresetEntry {
-    /// 상대 경로
+    /// Relative path
     pub path: String,
-    /// 디렉토리 여부
+    /// Whether it's a directory
     pub is_dir: bool,
 }
 
-/// 프리셋 정의
+/// Preset definition
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Preset {
-    /// 프리셋 이름
+    /// Preset name
     pub name: String,
-    /// 원본 경로 (절대 경로)
+    /// Source path (absolute path)
     pub source: String,
-    /// 포함된 파일/디렉토리 목록
+    /// List of included files/directories
     pub entries: Vec<PresetEntry>,
 }
 
-/// 개별 link 기록
+/// Individual link record
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LinkRecord {
-    /// 프리셋 이름
+    /// Preset name
     pub preset: String,
-    /// link된 대상 경로 (절대 경로)
+    /// Linked target path (absolute path)
     pub target: String,
-    /// link 생성 시간 (ISO 8601)
+    /// Link creation time (ISO 8601)
     pub linked_at: String,
 }
 
-/// 모든 link 기록을 관리하는 레지스트리
+/// Registry managing all link records
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct LinksRegistry {
-    /// link 기록 목록
+    /// List of link records
     pub links: Vec<LinkRecord>,
 }

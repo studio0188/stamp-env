@@ -14,17 +14,17 @@ pub struct PresetManager {
 impl PresetManager {
     pub fn new() -> Result<Self> {
         let presets_dir = dirs::config_dir()
-            .context("설정 디렉토리를 찾을 수 없습니다")?
+            .context("Could not find config directory")?
             .join("stamp.env")
             .join("presets");
 
         fs::create_dir_all(&presets_dir)
-            .context("프리셋 디렉토리를 생성할 수 없습니다")?;
+            .context("Could not create presets directory")?;
 
         Ok(Self { presets_dir })
     }
 
-    /// 프리셋 목록 조회
+    /// List all presets
     pub fn list(&self) -> Result<Vec<String>> {
         let mut presets = Vec::new();
 
@@ -44,26 +44,26 @@ impl PresetManager {
         Ok(presets)
     }
 
-    /// 프리셋 로드
+    /// Load a preset
     pub fn load(&self, name: &str) -> Result<Preset> {
         let path = self.presets_dir.join(format!("{name}.toml"));
         let content = fs::read_to_string(&path)
-            .with_context(|| format!("프리셋 파일을 읽을 수 없습니다: {}", path.display()))?;
+            .with_context(|| format!("Could not read preset file: {}", path.display()))?;
 
         let preset: Preset = toml::from_str(&content)
-            .with_context(|| format!("프리셋 파일을 파싱할 수 없습니다: {}", path.display()))?;
+            .with_context(|| format!("Could not parse preset file: {}", path.display()))?;
 
         Ok(preset)
     }
 
-    /// 현재 디렉토리 구조를 프리셋으로 저장
-    /// 저장된 엔트리 목록을 반환
+    /// Save current directory structure as a preset
+    /// Returns the list of saved entries
     pub fn commit(&self, name: &str, source: &Path, patterns: Option<&[String]>) -> Result<Vec<PresetEntry>> {
         let source_abs = source
             .canonicalize()
-            .context("소스 경로를 확인할 수 없습니다")?;
+            .context("Could not resolve source path")?;
 
-        // Glob 패턴 컴파일
+        // Compile glob patterns
         let compiled_patterns: Option<Vec<Pattern>> = patterns.map(|p| {
             p.iter()
                 .filter_map(|pat| Pattern::new(pat).ok())
@@ -80,11 +80,11 @@ impl PresetManager {
             let path = entry.path();
             let relative = path
                 .strip_prefix(&source_abs)
-                .context("상대 경로를 계산할 수 없습니다")?;
+                .context("Could not calculate relative path")?;
 
             let relative_str = relative.to_string_lossy();
 
-            // 패턴 필터링: 패턴이 지정된 경우, 하나 이상 매칭되어야 포함
+            // Pattern filtering: if patterns are specified, include only if at least one matches
             let should_include = match &compiled_patterns {
                 Some(pats) if !pats.is_empty() => {
                     pats.iter().any(|pat| pat.matches(&relative_str))
@@ -107,21 +107,21 @@ impl PresetManager {
         };
 
         let content = toml::to_string_pretty(&preset)
-            .context("프리셋을 직렬화할 수 없습니다")?;
+            .context("Could not serialize preset")?;
 
         let path = self.presets_dir.join(format!("{name}.toml"));
         fs::write(&path, content)
-            .with_context(|| format!("프리셋 파일을 저장할 수 없습니다: {}", path.display()))?;
+            .with_context(|| format!("Could not save preset file: {}", path.display()))?;
 
         Ok(entries)
     }
 
-    /// links.toml 파일 경로
+    /// Path to links.toml file
     fn links_file(&self) -> PathBuf {
         self.presets_dir.parent().unwrap().join("links.toml")
     }
 
-    /// 링크 레지스트리 로드
+    /// Load links registry
     fn load_links_registry(&self) -> Result<LinksRegistry> {
         let path = self.links_file();
         if !path.exists() {
@@ -129,36 +129,36 @@ impl PresetManager {
         }
 
         let content = fs::read_to_string(&path)
-            .with_context(|| format!("링크 레지스트리를 읽을 수 없습니다: {}", path.display()))?;
+            .with_context(|| format!("Could not read links registry: {}", path.display()))?;
 
         let registry: LinksRegistry = toml::from_str(&content)
-            .with_context(|| format!("링크 레지스트리를 파싱할 수 없습니다: {}", path.display()))?;
+            .with_context(|| format!("Could not parse links registry: {}", path.display()))?;
 
         Ok(registry)
     }
 
-    /// 링크 레지스트리 저장
+    /// Save links registry
     fn save_links_registry(&self, registry: &LinksRegistry) -> Result<()> {
         let path = self.links_file();
         let content = toml::to_string_pretty(registry)
-            .context("링크 레지스트리를 직렬화할 수 없습니다")?;
+            .context("Could not serialize links registry")?;
 
         fs::write(&path, content)
-            .with_context(|| format!("링크 레지스트리를 저장할 수 없습니다: {}", path.display()))?;
+            .with_context(|| format!("Could not save links registry: {}", path.display()))?;
 
         Ok(())
     }
 
-    /// 링크 기록 추가
+    /// Add a link record
     pub fn add_link(&self, preset_name: &str, target: &Path) -> Result<()> {
         let target_abs = target
             .canonicalize()
-            .with_context(|| format!("대상 경로를 확인할 수 없습니다: {}", target.display()))?;
+            .with_context(|| format!("Could not resolve target path: {}", target.display()))?;
         let target_str = target_abs.to_string_lossy().to_string();
 
         let mut registry = self.load_links_registry()?;
 
-        // 이미 같은 preset + target 조합이 있으면 업데이트
+        // Update if same preset + target combination already exists
         if let Some(existing) = registry
             .links
             .iter_mut()
@@ -177,16 +177,16 @@ impl PresetManager {
         Ok(())
     }
 
-    /// 특정 대상 경로의 링크 기록 제거
+    /// Remove link record for a specific target path
     pub fn remove_link(&self, target: &Path) -> Result<Option<String>> {
         let target_abs = target
             .canonicalize()
-            .with_context(|| format!("대상 경로를 확인할 수 없습니다: {}", target.display()))?;
+            .with_context(|| format!("Could not resolve target path: {}", target.display()))?;
         let target_str = target_abs.to_string_lossy().to_string();
 
         let mut registry = self.load_links_registry()?;
 
-        // 제거할 링크 찾기
+        // Find link to remove
         let removed_preset = registry
             .links
             .iter()
@@ -199,7 +199,7 @@ impl PresetManager {
         Ok(removed_preset)
     }
 
-    /// 특정 프리셋의 모든 링크된 대상 경로 조회
+    /// Get all linked target paths for a specific preset
     pub fn get_links(&self, preset_name: &str) -> Result<Vec<String>> {
         let registry = self.load_links_registry()?;
 
@@ -213,7 +213,7 @@ impl PresetManager {
         Ok(targets)
     }
 
-    /// 존재하지 않는 대상 경로 정리
+    /// Clean up non-existent target paths
     pub fn cleanup_broken_links(&self) -> Result<usize> {
         let mut registry = self.load_links_registry()?;
         let original_count = registry.links.len();

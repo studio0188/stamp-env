@@ -7,7 +7,7 @@ mod symlink;
 
 #[derive(Parser)]
 #[command(name = "stamp")]
-#[command(about = "프리셋 기반 폴더/파일 구조를 심링크로 배포하는 CLI 도구")]
+#[command(about = "A CLI tool for deploying preset-based folder/file structures via symlinks")]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -15,49 +15,49 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// 프리셋을 대상 경로에 심링크로 생성
+    /// Create symlinks from a preset to the target path
     Link {
-        /// 적용할 프리셋 이름
+        /// Name of the preset to apply
         preset: String,
-        /// 대상 경로 (기본: 현재 디렉토리)
+        /// Target path (default: current directory)
         target: Option<String>,
-        /// 확인 없이 진행
+        /// Proceed without confirmation
         #[arg(short, long)]
         yes: bool,
-        /// sync 트래킹 목록에 추가 (commit --sync 시 자동 동기화 대상)
+        /// Add to sync tracking list (auto-sync target for commit --sync)
         #[arg(short, long)]
         sync: bool,
-        /// 출력 없이 조용히 실행
+        /// Run quietly without output
         #[arg(short, long)]
         quiet: bool,
     },
-    /// 생성된 심링크 제거
+    /// Remove created symlinks
     Unlink {
-        /// 대상 경로 (기본: 현재 디렉토리)
+        /// Target path (default: current directory)
         target: Option<String>,
-        /// 출력 없이 조용히 실행
+        /// Run quietly without output
         #[arg(short, long)]
         quiet: bool,
     },
-    /// 현재 구조를 프리셋으로 저장
+    /// Save current structure as a preset
     Commit {
-        /// 프리셋 이름
+        /// Preset name
         name: String,
-        /// Glob 패턴으로 파일 필터 (예: "*.rs", "src/**/*.toml")
+        /// Filter files with glob patterns (e.g., "*.rs", "src/**/*.toml")
         #[arg(short, long)]
         patterns: Option<Vec<String>>,
-        /// 이미 link된 위치들에 변경사항 동기화
+        /// Sync changes to already linked locations
         #[arg(short, long)]
         sync: bool,
-        /// 출력 없이 조용히 실행
+        /// Run quietly without output
         #[arg(short = 'q', long)]
         quiet: bool,
     },
-    /// 저장된 프리셋 목록
+    /// List saved presets
     List,
-    /// 프리셋 내용 확인
+    /// Display preset contents
     Show {
-        /// 확인할 프리셋 이름
+        /// Name of the preset to show
         preset: String,
     },
 }

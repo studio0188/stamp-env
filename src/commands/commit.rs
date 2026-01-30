@@ -11,19 +11,19 @@ pub fn run(name: &str, patterns: Option<&[String]>, sync: bool, quiet: bool) -> 
     let entries = manager.commit(name, current_dir, patterns)?;
 
     if !quiet {
-        // 저장된 파일 목록 출력
+        // Print saved files
         let files: Vec<_> = entries.iter().filter(|e| !e.is_dir).collect();
         let dirs: Vec<_> = entries.iter().filter(|e| e.is_dir).collect();
 
         if !files.is_empty() {
-            println!("저장된 파일:");
+            println!("Saved files:");
             for entry in &files {
                 println!("  + {}", entry.path);
             }
         }
 
         if !dirs.is_empty() {
-            println!("저장된 디렉토리:");
+            println!("Saved directories:");
             for entry in &dirs {
                 println!("  + {}/", entry.path);
             }
@@ -31,33 +31,33 @@ pub fn run(name: &str, patterns: Option<&[String]>, sync: bool, quiet: bool) -> 
 
         if let Some(p) = patterns {
             println!(
-                "\n현재 구조를 프리셋 '{name}'으로 저장했습니다. (필터: {:?}, {}개 파일, {}개 디렉토리)",
+                "\nSaved current structure as preset '{name}'. (filter: {:?}, {} files, {} directories)",
                 p, files.len(), dirs.len()
             );
         } else {
             println!(
-                "\n현재 구조를 프리셋 '{name}'으로 저장했습니다. ({}개 파일, {}개 디렉토리)",
+                "\nSaved current structure as preset '{name}'. ({} files, {} directories)",
                 files.len(), dirs.len()
             );
         }
     }
 
-    // --sync 플래그가 있으면 link된 위치들에 동기화
+    // Sync to linked locations if --sync flag is set
     if sync {
         let targets = manager.get_links(name)?;
 
         if targets.is_empty() {
             if !quiet {
-                println!("동기화할 link된 위치가 없습니다.");
+                println!("No linked locations to sync.");
             }
         } else {
-            // 깨진 링크 정리
+            // Clean up broken links
             let cleaned = manager.cleanup_broken_links()?;
             if !quiet && cleaned > 0 {
-                println!("유효하지 않은 {cleaned}개의 링크 기록을 정리했습니다.");
+                println!("Cleaned up {cleaned} invalid link records.");
             }
 
-            // 프리셋 다시 로드
+            // Reload preset
             let preset = manager.load(name)?;
             let builder = SymlinkBuilder::new();
 
@@ -68,13 +68,13 @@ pub fn run(name: &str, patterns: Option<&[String]>, sync: bool, quiet: bool) -> 
                     builder.apply(&preset, target)?;
                     synced += 1;
                     if !quiet {
-                        println!("  - '{target_path}' 동기화 완료");
+                        println!("  - '{target_path}' synced");
                     }
                 }
             }
 
             if !quiet {
-                println!("{synced}개의 위치에 변경사항을 동기화했습니다.");
+                println!("Synced changes to {synced} locations.");
             }
         }
     }

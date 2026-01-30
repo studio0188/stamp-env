@@ -11,14 +11,14 @@ pub fn run(target: Option<&str>, quiet: bool) -> Result<()> {
     let builder = SymlinkBuilder::new();
     let removed = builder.unlink(target)?;
 
-    // 링크 기록 제거
+    // Remove link record
     let manager = PresetManager::new()?;
     let preset_name = manager.remove_link(target).ok().flatten();
 
     if !quiet {
-        // 제거된 심링크 목록 출력
+        // Print removed symlinks
         if !removed.is_empty() {
-            println!("제거된 심링크:");
+            println!("Removed symlinks:");
             for path in &removed {
                 println!("  - {}", path);
             }
@@ -26,12 +26,12 @@ pub fn run(target: Option<&str>, quiet: bool) -> Result<()> {
 
         if let Some(preset) = preset_name {
             println!(
-                "\n'{target_path}'에서 {}개의 심링크를 제거했습니다. (프리셋: {preset})",
+                "\nRemoved {} symlinks from '{target_path}'. (preset: {preset})",
                 removed.len()
             );
         } else {
             println!(
-                "\n'{target_path}'에서 {}개의 심링크를 제거했습니다.",
+                "\nRemoved {} symlinks from '{target_path}'.",
                 removed.len()
             );
         }

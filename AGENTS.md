@@ -1,52 +1,52 @@
 # stamp.env
 
-프리셋 기반 폴더/파일 구조를 심링크로 빠르게 배포하는 Rust CLI 도구.
+A Rust CLI tool for quickly deploying preset-based folder/file structures via symlinks.
 
-## 핵심 명령어
+## Core Commands
 
-- `stamp link <preset> [target]` - 프리셋을 대상 경로에 심링크로 생성
-- `stamp unlink [target]` - 생성된 심링크 제거
-- `stamp commit <name> [-p <patterns>...]` - 현재 구조를 프리셋으로 저장 (glob 패턴 필터 지원)
-- `stamp list` - 저장된 프리셋 목록
-- `stamp show <preset>` - 프리셋 내용 확인
+- `stamp link <preset> [target]` - Create symlinks from a preset to the target path
+- `stamp unlink [target]` - Remove created symlinks
+- `stamp commit <name> [-p <patterns>...]` - Save current structure as a preset (supports glob pattern filtering)
+- `stamp list` - List saved presets
+- `stamp show <preset>` - Display preset contents
 
-## 프로젝트 구조
+## Project Structure
 
 ```
 src/
-├── main.rs            # CLI 진입점 (clap 사용)
-├── commands/          # CLI 명령어 핸들러
+├── main.rs            # CLI entry point (using clap)
+├── commands/          # CLI command handlers
 │   ├── mod.rs
-│   ├── link.rs        # link 명령 구현
-│   ├── unlink.rs      # unlink 명령 구현
-│   ├── commit.rs      # commit 명령 구현
-│   └── list.rs        # list/show 명령 구현
-├── preset/            # 프리셋 관리 로직
+│   ├── link.rs        # link command implementation
+│   ├── unlink.rs      # unlink command implementation
+│   ├── commit.rs      # commit command implementation
+│   └── list.rs        # list/show command implementation
+├── preset/            # Preset management logic
 │   ├── mod.rs
-│   └── manager.rs     # 프리셋 저장/로드
-└── symlink/           # 심링크 생성 로직
+│   └── manager.rs     # Preset save/load
+└── symlink/           # Symlink creation logic
     ├── mod.rs
     └── builder.rs
 ```
 
-## 코딩 규칙
+## Coding Rules
 
-- **에러 처리**: `anyhow` 크레이트 사용
-- **프리셋 형식**: TOML 직렬화 (`serde`, `toml`)
-- **심링크 충돌**: 기존 파일 존재 시 사용자 확인 필요
-- **CLI 파싱**: `clap` derive 매크로 사용
+- **Error handling**: Use `anyhow` crate
+- **Preset format**: TOML serialization (`serde`, `toml`)
+- **Symlink conflicts**: Require user confirmation when existing files exist
+- **CLI parsing**: Use `clap` derive macro
 
-## 의존성
+## Dependencies
 
-| 크레이트 | 용도               |
-| -------- | ------------------ |
-| clap     | CLI 인자 파싱      |
-| anyhow   | 에러 처리          |
-| serde    | 직렬화/역직렬화    |
-| toml     | 프리셋 파일 형식   |
-| walkdir  | 디렉토리 재귀 탐색 |
-| glob     | 파일 패턴 매칭     |
+| Crate    | Purpose                    |
+| -------- | -------------------------- |
+| clap     | CLI argument parsing       |
+| anyhow   | Error handling             |
+| serde    | Serialization/deserialization |
+| toml     | Preset file format         |
+| walkdir  | Recursive directory traversal |
+| glob     | File pattern matching      |
 
-## 프리셋 저장 위치
+## Preset Storage Location
 
-`~/.config/stamp.env/presets/` 디렉토리에 TOML 파일로 저장됨.
+Presets are stored as TOML files in `~/.config/stamp.env/presets/`.

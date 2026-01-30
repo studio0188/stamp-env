@@ -12,9 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Initial release
-- `stamp link` - 프리셋을 대상 경로에 심링크로 생성
-- `stamp unlink` - 생성된 심링크 제거
-- `stamp commit` - 현재 구조를 프리셋으로 저장 (glob 패턴 필터 지원)
-- `stamp list` - 저장된 프리셋 목록
-- `stamp show` - 프리셋 내용 확인
-- `--sync` 플래그로 link 트래킹 및 자동 동기화 지원
+- `stamp link` - Create symlinks from a preset to the target path
+- `stamp unlink` - Remove created symlinks
+- `stamp commit` - Save current structure as a preset (supports glob pattern filtering)
+- `stamp list` - List saved presets
+- `stamp show` - Display preset contents
+- `--sync` flag for link tracking and auto-synchronization
