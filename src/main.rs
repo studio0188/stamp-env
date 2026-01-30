@@ -24,6 +24,9 @@ enum Commands {
         /// 확인 없이 진행
         #[arg(short, long)]
         yes: bool,
+        /// sync 트래킹 목록에 추가 (commit --sync 시 자동 동기화 대상)
+        #[arg(short, long)]
+        sync: bool,
     },
     /// 생성된 심링크 제거
     Unlink {
@@ -37,6 +40,9 @@ enum Commands {
         /// Glob 패턴으로 파일 필터 (예: "*.rs", "src/**/*.toml")
         #[arg(short, long)]
         patterns: Option<Vec<String>>,
+        /// 이미 link된 위치들에 변경사항 동기화
+        #[arg(short, long)]
+        sync: bool,
     },
     /// 저장된 프리셋 목록
     List,
@@ -51,14 +57,23 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Link { preset, target, yes } => {
-            commands::link::run(&preset, target.as_deref(), yes)?;
+        Commands::Link {
+            preset,
+            target,
+            yes,
+            sync,
+        } => {
+            commands::link::run(&preset, target.as_deref(), yes, sync)?;
         }
         Commands::Unlink { target } => {
             commands::unlink::run(target.as_deref())?;
         }
-        Commands::Commit { name, patterns } => {
-            commands::commit::run(&name, patterns.as_deref())?;
+        Commands::Commit {
+            name,
+            patterns,
+            sync,
+        } => {
+            commands::commit::run(&name, patterns.as_deref(), sync)?;
         }
         Commands::List => {
             commands::list::run()?;
