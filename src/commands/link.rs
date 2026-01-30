@@ -55,6 +55,9 @@ pub fn run(preset_name: &str, target: Option<&str>, skip_confirm: bool) -> Resul
     let builder = SymlinkBuilder::new();
     builder.apply(&preset, target)?;
 
+    // 링크 기록 저장
+    manager.add_link(preset_name, target)?;
+
     println!("프리셋 '{preset_name}'을 '{target_path}'에 적용했습니다.");
     Ok(())
 }

@@ -37,6 +37,9 @@ enum Commands {
         /// Glob 패턴으로 파일 필터 (예: "*.rs", "src/**/*.toml")
         #[arg(short, long)]
         patterns: Option<Vec<String>>,
+        /// 이미 link된 위치들에 변경사항 동기화
+        #[arg(short, long)]
+        sync: bool,
     },
     /// 저장된 프리셋 목록
     List,
@@ -57,8 +60,12 @@ fn main() -> Result<()> {
         Commands::Unlink { target } => {
             commands::unlink::run(target.as_deref())?;
         }
-        Commands::Commit { name, patterns } => {
-            commands::commit::run(&name, patterns.as_deref())?;
+        Commands::Commit {
+            name,
+            patterns,
+            sync,
+        } => {
+            commands::commit::run(&name, patterns.as_deref(), sync)?;
         }
         Commands::List => {
             commands::list::run()?;
