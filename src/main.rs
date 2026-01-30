@@ -6,7 +6,7 @@ mod preset;
 mod symlink;
 
 #[derive(Parser)]
-#[command(name = "stamp")]
+#[command(name = "stampenv")]
 #[command(about = "A CLI tool for deploying preset-based folder/file structures via symlinks")]
 struct Cli {
     #[command(subcommand)]

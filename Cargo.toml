@@ -8,7 +8,7 @@ repository = "https://github.com/studio0188/stamp-env"
 homepage = "https://github.com/studio0188/stamp-env"
 
 [[bin]]
-name = "stamp"
+name = "stampenv"
 path = "src/main.rs"
 
 [dependencies]
