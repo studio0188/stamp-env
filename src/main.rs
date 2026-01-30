@@ -60,6 +60,18 @@ enum Commands {
         /// Name of the preset to show
         preset: String,
     },
+    /// Delete saved presets
+    Delete {
+        /// Names of presets to delete (supports multiple)
+        #[arg(required = true)]
+        presets: Vec<String>,
+        /// Proceed without confirmation
+        #[arg(short, long)]
+        yes: bool,
+        /// Also unlink from all locations where these presets are linked
+        #[arg(long)]
+        unlink: bool,
+    },
 }
 
 fn main() -> Result<()> {
@@ -91,6 +103,13 @@ fn main() -> Result<()> {
         }
         Commands::Show { preset } => {
             commands::list::show(&preset)?;
+        }
+        Commands::Delete {
+            presets,
+            yes,
+            unlink,
+        } => {
+            commands::delete::run(&presets, yes, unlink)?;
         }
     }
 

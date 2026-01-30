@@ -227,4 +227,38 @@ impl PresetManager {
 
         Ok(removed)
     }
+
+    /// Check if a preset exists
+    pub fn exists(&self, name: &str) -> bool {
+        let path = self.presets_dir.join(format!("{name}.toml"));
+        path.exists()
+    }
+
+    /// Delete a preset and optionally remove its link records
+    pub fn delete(&self, name: &str, remove_link_records: bool) -> Result<()> {
+        let path = self.presets_dir.join(format!("{name}.toml"));
+        if !path.exists() {
+            anyhow::bail!("Preset '{name}' not found");
+        }
+        fs::remove_file(&path)
+            .with_context(|| format!("Could not delete preset: {}", path.display()))?;
+
+        // Remove link records for this preset if requested
+        if remove_link_records {
+            self.remove_links_for_preset(name)?;
+        }
+        Ok(())
+    }
+
+    /// Remove all link records for a specific preset
+    pub fn remove_links_for_preset(&self, preset_name: &str) -> Result<usize> {
+        let mut registry = self.load_links_registry()?;
+        let original_count = registry.links.len();
+        registry.links.retain(|r| r.preset != preset_name);
+        let removed = original_count - registry.links.len();
+        if removed > 0 {
+            self.save_links_registry(&registry)?;
+        }
+        Ok(removed)
+    }
 }
