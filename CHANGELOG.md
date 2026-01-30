@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-01-31
+
+### Added
+
+- `stampenv delete` - Delete saved presets
+  - Support multiple preset deletion (`stampenv delete preset1 preset2`)
+  - `--yes` flag to skip confirmation prompt
+  - `--unlink` flag to also remove symlinks from linked locations
+
 ## [0.1.1] - 2026-01-31
 
 ### Changed
