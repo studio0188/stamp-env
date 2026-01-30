@@ -1,6 +1,6 @@
 [package]
 name = "stamp-env"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "A CLI tool for deploying preset-based folder/file structures via symlinks"
 license = "MIT"
