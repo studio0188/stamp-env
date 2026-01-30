@@ -4,6 +4,8 @@ version = "0.1.0"
 edition = "2021"
 description = "프리셋 기반 폴더/파일 구조를 심링크로 배포하는 CLI 도구"
 license = "MIT"
+repository = "https://github.com/studio0188/stamp-env"
+homepage = "https://github.com/studio0188/stamp-env"
 
 [[bin]]
 name = "stamp"
@@ -18,3 +20,8 @@ walkdir = "2"
 dirs = "5"
 glob = "0.3"
 chrono = "0.4"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
