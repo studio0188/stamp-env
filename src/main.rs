@@ -27,11 +27,17 @@ enum Commands {
         /// sync 트래킹 목록에 추가 (commit --sync 시 자동 동기화 대상)
         #[arg(short, long)]
         sync: bool,
+        /// 출력 없이 조용히 실행
+        #[arg(short, long)]
+        quiet: bool,
     },
     /// 생성된 심링크 제거
     Unlink {
         /// 대상 경로 (기본: 현재 디렉토리)
         target: Option<String>,
+        /// 출력 없이 조용히 실행
+        #[arg(short, long)]
+        quiet: bool,
     },
     /// 현재 구조를 프리셋으로 저장
     Commit {
@@ -43,6 +49,9 @@ enum Commands {
         /// 이미 link된 위치들에 변경사항 동기화
         #[arg(short, long)]
         sync: bool,
+        /// 출력 없이 조용히 실행
+        #[arg(short = 'q', long)]
+        quiet: bool,
     },
     /// 저장된 프리셋 목록
     List,
@@ -62,18 +71,20 @@ fn main() -> Result<()> {
             target,
             yes,
             sync,
+            quiet,
         } => {
-            commands::link::run(&preset, target.as_deref(), yes, sync)?;
+            commands::link::run(&preset, target.as_deref(), yes, sync, quiet)?;
         }
-        Commands::Unlink { target } => {
-            commands::unlink::run(target.as_deref())?;
+        Commands::Unlink { target, quiet } => {
+            commands::unlink::run(target.as_deref(), quiet)?;
         }
         Commands::Commit {
             name,
             patterns,
             sync,
+            quiet,
         } => {
-            commands::commit::run(&name, patterns.as_deref(), sync)?;
+            commands::commit::run(&name, patterns.as_deref(), sync, quiet)?;
         }
         Commands::List => {
             commands::list::run()?;

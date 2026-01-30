@@ -57,7 +57,8 @@ impl PresetManager {
     }
 
     /// 현재 디렉토리 구조를 프리셋으로 저장
-    pub fn commit(&self, name: &str, source: &Path, patterns: Option<&[String]>) -> Result<()> {
+    /// 저장된 엔트리 목록을 반환
+    pub fn commit(&self, name: &str, source: &Path, patterns: Option<&[String]>) -> Result<Vec<PresetEntry>> {
         let source_abs = source
             .canonicalize()
             .context("소스 경로를 확인할 수 없습니다")?;
@@ -102,7 +103,7 @@ impl PresetManager {
         let preset = Preset {
             name: name.to_string(),
             source: source_abs.to_string_lossy().to_string(),
-            entries,
+            entries: entries.clone(),
         };
 
         let content = toml::to_string_pretty(&preset)
@@ -112,7 +113,7 @@ impl PresetManager {
         fs::write(&path, content)
             .with_context(|| format!("프리셋 파일을 저장할 수 없습니다: {}", path.display()))?;
 
-        Ok(())
+        Ok(entries)
     }
 
     /// links.toml 파일 경로

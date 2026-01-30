@@ -12,8 +12,10 @@ impl SymlinkBuilder {
     }
 
     /// 프리셋을 대상 경로에 심링크로 적용
-    pub fn apply(&self, preset: &Preset, target: &Path) -> Result<()> {
+    /// 생성된 심링크 경로 목록을 반환
+    pub fn apply(&self, preset: &Preset, target: &Path) -> Result<Vec<String>> {
         let source_base = Path::new(&preset.source);
+        let mut created = Vec::new();
 
         for entry in &preset.entries {
             let source = source_base.join(&entry.path);
@@ -42,15 +44,18 @@ impl SymlinkBuilder {
                 #[cfg(windows)]
                 std::os::windows::fs::symlink_file(&source, &dest)
                     .with_context(|| format!("심링크 생성 실패: {} -> {}", dest.display(), source.display()))?;
+
+                created.push(dest.to_string_lossy().to_string());
             }
         }
 
-        Ok(())
+        Ok(created)
     }
 
     /// 대상 경로에서 심링크 제거
-    pub fn unlink(&self, target: &Path) -> Result<usize> {
-        let mut count = 0;
+    /// 제거된 심링크 경로 목록을 반환
+    pub fn unlink(&self, target: &Path) -> Result<Vec<String>> {
+        let mut removed = Vec::new();
 
         for entry in walkdir::WalkDir::new(target)
             .min_depth(1)
@@ -62,14 +67,15 @@ impl SymlinkBuilder {
             // 심링크인지 확인
             if let Ok(metadata) = path.symlink_metadata() {
                 if metadata.file_type().is_symlink() {
+                    let path_str = path.to_string_lossy().to_string();
                     fs::remove_file(path)
                         .with_context(|| format!("심링크 제거 실패: {}", path.display()))?;
-                    count += 1;
+                    removed.push(path_str);
                 }
             }
         }
 
-        Ok(count)
+        Ok(removed)
     }
 }
 

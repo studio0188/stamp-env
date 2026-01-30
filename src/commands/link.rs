@@ -31,7 +31,7 @@ fn confirm(message: &str) -> Result<bool> {
     Ok(input == "y" || input == "yes")
 }
 
-pub fn run(preset_name: &str, target: Option<&str>, skip_confirm: bool, sync: bool) -> Result<()> {
+pub fn run(preset_name: &str, target: Option<&str>, skip_confirm: bool, sync: bool, quiet: bool) -> Result<()> {
     let target_path = target.unwrap_or(".");
     let target = Path::new(target_path);
 
@@ -53,14 +53,33 @@ pub fn run(preset_name: &str, target: Option<&str>, skip_confirm: bool, sync: bo
         .with_context(|| format!("프리셋 '{preset_name}'을 찾을 수 없습니다"))?;
 
     let builder = SymlinkBuilder::new();
-    builder.apply(&preset, target)?;
+    let created = builder.apply(&preset, target)?;
 
     // --sync일 때만 링크 기록 저장
     if sync {
         manager.add_link(preset_name, target)?;
-        println!("프리셋 '{preset_name}'을 '{target_path}'에 적용했습니다. (트래킹 활성화)");
-    } else {
-        println!("프리셋 '{preset_name}'을 '{target_path}'에 적용했습니다.");
+    }
+
+    if !quiet {
+        // 생성된 심링크 목록 출력
+        if !created.is_empty() {
+            println!("생성된 심링크:");
+            for path in &created {
+                println!("  + {}", path);
+            }
+        }
+
+        if sync {
+            println!(
+                "\n프리셋 '{preset_name}'을 '{target_path}'에 적용했습니다. (트래킹 활성화, {}개 심링크)",
+                created.len()
+            );
+        } else {
+            println!(
+                "\n프리셋 '{preset_name}'을 '{target_path}'에 적용했습니다. ({}개 심링크)",
+                created.len()
+            );
+        }
     }
 
     Ok(())
